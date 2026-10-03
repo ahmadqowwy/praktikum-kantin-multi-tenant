@@ -1,56 +1,10 @@
-{{-- 
-    resources/views/components/empty-state.blade.php
-
-    Fungsi:
-    - Tampilan standar ketika sebuah halaman tidak mempunyai data.
-
-    Contoh:
-
-    <x-empty-state
-        title="Belum ada pesanan"
-        description="Pesanan baru akan muncul di sini."
-    />
-
-    Isi tambahan dapat diberikan melalui $slot.
---}}
-
-@props([
-    // Judul utama empty state.
-    'title' => 'Belum ada data',
-
-    // Penjelasan tambahan.
-    'description' => 'Data belum tersedia.',
-])
-
-<div
-    {{ $attributes->merge([
-        'class' => 'rounded-xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center',
-    ]) }}
->
-
-    {{-- Icon sederhana menggunakan karakter, sehingga tidak perlu library icon. --}}
-    <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-xl">
-        —
-    </div>
-
-    {{-- Judul empty state. --}}
-    <h2 class="text-base font-semibold text-gray-900">
-        {{ $title }}
-    </h2>
-
-    {{-- Deskripsi empty state. --}}
-    <p class="mx-auto mt-1 max-w-md text-sm text-gray-500">
-        {{ $description }}
-    </p>
-
-    {{-- 
-        $slot bersifat opsional.
-        Misalnya dapat berisi tombol "Tambah menu".
-    --}}
-    @if ($slot->isNotEmpty())
-        <div class="mt-4">
-            {{ $slot }}
-        </div>
+@props(['title' => 'Belum ada data', 'description' => null])
+<div {{ $attributes->class('flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 p-10 text-center dark:border-zinc-700') }}>
+    <p class="text-sm font-medium text-zinc-800 dark:text-zinc-100">{{ $title }}</p>
+    @if ($description)
+        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $description }}</p>
     @endif
-
+    @isset($action)
+        <div class="mt-2">{{ $action }}</div>
+    @endisset
 </div>

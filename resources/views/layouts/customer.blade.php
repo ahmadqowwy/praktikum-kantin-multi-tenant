@@ -1,101 +1,105 @@
 {{-- 
-    resources/views/layouts/customer.blade.php
+    Layout Customer / Pelanggan
 
     Fungsi:
-    - Menjadi layout utama untuk halaman pelanggan anonim.
-    - Digunakan untuk halaman seperti:
-      1. Scan / validasi QR meja
-      2. Daftar tenant
-      3. Daftar menu
-      4. Keranjang
-      5. Checkout
-      6. Pembayaran
-      7. Tracking pesanan
+    Layout utama untuk seluruh halaman pelanggan (customer).
+    Layout ini menyediakan struktur tampilan yang konsisten,
+    meliputi header, konten utama, footer, dan script Flux.
 
-    Catatan:
-    - Layout ini TIDAK menggunakan $auth->user().
-    - Customer pada SRS adalah pengguna anonim tanpa akun.
-    - Konten halaman anak akan dimasukkan melalui @yield('content').
+    Penggunaan:
+    <x-layouts.customer title="Menu Kantin">
+        ...
+    </x-layouts.customer>
 
+    Bagian $slot akan diisi oleh konten halaman yang menggunakan
+    layout ini.
+--}}
+
+@props([
+    // Judul halaman, dengan nilai default "Pelanggan"
+    'title' => 'Pelanggan'
+])
 
 <!DOCTYPE html>
-<html lang="id">
-
+<html
+    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    class="antialiased"
+>
 <head>
-    <meta charset="UTF-8">
-
-    {{-- Membuat tampilan mengikuti ukuran layar perangkat. --}}
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    {{-- Judul dapat diubah oleh halaman anak melalui @section('title'). --}}
-    <title>
-        @yield('title', 'Kantin Teknik')
-    </title>
-
     {{-- 
-        Vite memuat CSS dan JavaScript aplikasi Laravel.
-        Jika project belum menggunakan Vite pada tahap ini,
-        bagian ini dapat tetap dipertahankan untuk tahap berikutnya.
+        Memuat bagian <head> dari partials.head.
+        Biasanya berisi metadata, CSS, dan konfigurasi halaman.
     --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900">
-
+<body
+    class="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+>
     {{-- 
-        Header customer.
-        Mengikuti konsep mockup "KANTIN TEKNIK".
-        Header dibuat sederhana supaya nyaman pada layar ponsel.
+        Container utama halaman customer.
+        max-w-md membatasi lebar tampilan agar sesuai
+        dengan tampilan berbasis mobile.
     --}}
-    <header class="border-b bg-white">
-        <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-
-            {{-- Nama aplikasi / kantin. --}}
-            <a
-                href="/"
-                class="font-bold tracking-wide text-gray-900"
-            >
-                KANTIN TEKNIK
-            </a>
-
-            {{-- 
-                Bagian kanan dapat digunakan untuk informasi meja
-                atau jumlah item keranjang pada tahap berikutnya.
-            --}}
-            @hasSection('header-action')
-                <div>
-                    @yield('header-action')
-                </div>
-            @endif
-
-        </div>
-    </header>
-
-    {{-- 
-        Konten utama.
-        max-w-3xl menjaga tampilan agar tetap nyaman dibaca
-        pada mobile maupun layar yang lebih besar.
-    --}}
-    <main class="mx-auto w-full max-w-3xl px-4 py-5">
+    <div class="mx-auto flex min-h-screen w-full max-w-md flex-col">
 
         {{-- 
-            Halaman seperti katalog, cart, checkout, dan tracking
-            akan mengisi bagian ini.
+            Header halaman.
+            Menggunakan sticky agar tetap berada di bagian atas
+            ketika halaman digulir.
         --}}
-        @yield('content')
+        <header
+            class="sticky top-0 z-10 flex min-h-14 items-center gap-2
+                   border-b border-zinc-200 bg-white/90 px-4 backdrop-blur
+                   dark:border-zinc-800 dark:bg-zinc-900/90"
+        >
+            {{-- 
+                Menampilkan judul halaman.
+                Nilai berasal dari properti $title.
+            --}}
+            <span class="text-base font-semibold">
+                {{ $title }}
+            </span>
 
-    </main>
+            {{-- 
+                Menampilkan konten tambahan di sebelah kanan header
+                jika variabel $headerRight tersedia.
+            --}}
+            @isset($headerRight)
+                <div class="ms-auto">
+                    {{ $headerRight }}
+                </div>
+            @endisset
+        </header>
+
+        {{-- 
+            Konten utama halaman.
+
+            $slot merupakan tempat konten dari halaman yang
+            menggunakan layout ini akan ditampilkan.
+        --}}
+        <main class="flex-1 p-4">
+            {{ $slot }}
+        </main>
+
+        {{-- 
+            Footer halaman.
+            Nama aplikasi diambil dari konfigurasi Laravel
+            melalui config('app.name').
+        --}}
+        <footer
+            class="border-t border-zinc-200 p-4 text-center text-xs
+                   text-zinc-500 dark:border-zinc-800 dark:text-zinc-400"
+        >
+            {{ config('app.name') }}
+        </footer>
+
+    </div>
 
     {{-- 
-        Footer sederhana.
-        Tidak menggunakan informasi user/auth karena customer anonim.
+        Memuat script Laravel Flux yang diperlukan
+        untuk komponen interaktif.
     --}}
-    <footer class="mx-auto max-w-3xl px-4 py-6 text-center text-xs text-gray-500">
-        Kantin Teknik · Sistem Aplikasi Kantin Multi-Tenant
-    </footer>
-
+    @fluxScripts
 </body>
 </html>
